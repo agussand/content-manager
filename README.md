@@ -1,1 +1,1 @@
-# initial-scaffolding
+# Content Manager App
