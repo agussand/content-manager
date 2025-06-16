@@ -14,13 +14,14 @@ public interface PostService {
     Post createPost(Post post, User author);
     Post findById(String id);
     Post findBySlug(String slug);
+    List<Post> allPosts();
     Page<Post> getPublishedPosts(Pageable pageable);
     Page<Post> getPostsByAuthor(String authorId, String status, Pageable pageable);
     Page<Post> getPostsByTags(List<String> tags, Pageable pageable);
     Page<Post> getPostsByCategory(String category, Pageable pageable);
     Page<Post> searchPosts(String title, Pageable pageable);
     Post updatePost(String id, Post updatedPost);
-    Post updatePostCommentCount(Post post);
-    Post incrementViews(String id);
+    void updatePostCommentCount(Post post);
+    void incrementViews(String id);
     void deletePost(String id);
 }

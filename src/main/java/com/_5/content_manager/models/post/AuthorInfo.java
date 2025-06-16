@@ -11,4 +11,5 @@ public class AuthorInfo {
     private String userId;
     private String username;
     private String displayName;
+    private String avatarUrl;
 }

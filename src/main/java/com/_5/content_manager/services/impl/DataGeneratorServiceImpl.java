@@ -7,8 +7,12 @@ import com._5.content_manager.dtos.FakeVideoDTO;
 import com._5.content_manager.entities.Comment;
 import com._5.content_manager.entities.Post;
 import com._5.content_manager.entities.User;
+import com._5.content_manager.models.comment.CommentStats;
+import com._5.content_manager.models.post.AuthorInfo;
 import com._5.content_manager.models.post.Media;
 import com._5.content_manager.models.post.PostStats;
+import com._5.content_manager.repositories.CommentRepository;
+import com._5.content_manager.services.CommentService;
 import com._5.content_manager.services.DataGeneratorService;
 import com._5.content_manager.services.PostService;
 import com._5.content_manager.services.UserService;
@@ -16,6 +20,8 @@ import com._5.content_manager.utils.FechaUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -91,6 +97,9 @@ public class DataGeneratorServiceImpl implements DataGeneratorService {
     private final Random random = new Random();
 
     @Autowired
+    private CommentRepository commentRepository;
+
+    @Autowired
     private UserService userService;
 
     @Autowired
@@ -98,6 +107,9 @@ public class DataGeneratorServiceImpl implements DataGeneratorService {
 
     @Autowired
     private PostService postService;
+
+    @Autowired
+    private CommentService commentService;
 
 
     @Override
@@ -161,15 +173,51 @@ public class DataGeneratorServiceImpl implements DataGeneratorService {
                 newPost.setMedia(media);
             }
 
-
             posts.add(postService.createPost(newPost, usuarioRandom));
+
         }
+
         return posts;
     }
 
     @Override
     public List<Comment> generateComments() {
-        return List.of();
+        List<Post> posts = postService.allPosts();
+        List<FakeCommentDTO> fakeComments = getFakeComments();
+        List<Comment> comments = new ArrayList<>();
+        List<User> users = userService.getAllActiveUsers();
+        Collections.shuffle(fakeComments);
+
+        for (Post post : posts){
+            if(Math.random() < 0.7){
+                FakeCommentDTO rdmFakeComment = fakeComments.get(random.nextInt(fakeComments.size() - 1));
+                User author = users.get(random.nextInt(users.size() - 1));
+
+                Comment newComment = new Comment();
+                newComment.setPostId(post.getId());
+                newComment.setContent(rdmFakeComment.getBody());
+                newComment.setAuthor(AuthorInfo.builder()
+                        .userId(author.getId())
+                        .username(author.getUsername())
+                        .avatarUrl(author.getProfile().getAvatarUrl())
+                        .displayName(author.getProfile() != null ?
+                                author.getProfile().getFirstName() + " " + author.getProfile().getLastName() :
+                                author.getUsername())
+                        .build());
+                CommentStats commentStats = new CommentStats();
+                if(Math.random() < 0.5){
+                    commentStats.setLikesCount(random.nextInt(50));
+                    commentStats.setRepliesCount(random.nextInt(50));
+                }
+                newComment.setStats(commentStats);
+                newComment.setCreatedAt(FechaUtils.generarFechaEntre(post.getPublishedAt(), LocalDateTime.now()));
+                newComment.setUpdatedAt(newComment.getCreatedAt());
+
+                postService.updatePostCommentCount(post);
+                comments.add(newComment);
+            }
+        }
+        return commentRepository.saveAll(comments);
     }
 
     private List<String> getListaAleatoria(List<String> lista){

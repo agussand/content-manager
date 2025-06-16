@@ -35,9 +35,8 @@ public class CommentServiceImpl implements CommentService {
     public Comment createComment(Comment comment, String authorId) {
         User author = userService.findById(authorId);
         Post post = postService.findById(comment.getPostId());
-
-        post.setAuthor(AuthorInfo.builder()
-                        .userId(authorId)
+        comment.setAuthor(AuthorInfo.builder()
+                        .userId(author.getId())
                         .username(author.getUsername())
                         .displayName(author.getProfile() != null ?
                                 author.getProfile().getFirstName() + " " + author.getProfile().getLastName() :

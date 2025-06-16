@@ -29,8 +29,9 @@ public class PostServiceImpl implements PostService {
     @Override
     public Post createPost(Post post, User author) {
         post.setAuthor(AuthorInfo.builder()
-                        .userId(author.getId())
-                        .username(author.getUsername())
+                .userId(author.getId())
+                .username(author.getUsername())
+                .avatarUrl(author.getProfile().getAvatarUrl())
                         .displayName(author.getProfile() != null ?
                                 author.getProfile().getFirstName() + " " + author.getProfile().getLastName() :
                                 author.getUsername())
@@ -41,8 +42,8 @@ public class PostServiceImpl implements PostService {
             post.setSlug(generateSlug(post.getTitle()));
         }
 
-        post.setCreatedAt(LocalDateTime.now());
-        post.setUpdatedAt(LocalDateTime.now());
+        post.setCreatedAt(post.getPublishedAt());
+        post.setUpdatedAt(post.getPublishedAt());
 
         Post savedPost = postRepository.save(post);
 
@@ -61,6 +62,11 @@ public class PostServiceImpl implements PostService {
     @Override
     public Post findBySlug(String slug) {
         return postRepository.findBySlug(slug).orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "No existe un usuario con el slug: "+slug));
+    }
+
+    @Override
+    public List<Post> allPosts() {
+        return postRepository.findAll();
     }
 
     @Override
@@ -106,16 +112,16 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Post updatePostCommentCount(Post post) {
+    public void updatePostCommentCount(Post post) {
         post.getStats().setCommentsCount(post.getStats().getCommentsCount() + 1);
-        return postRepository.save(post);
+        postRepository.save(post);
     }
 
     @Override
-    public Post incrementViews(String id) {
+    public void incrementViews(String id) {
         Post post = this.findById(id);
         post.getStats().setViewsCount(post.getStats().getViewsCount() + 1);
-        return postRepository.save(post);
+        postRepository.save(post);
     }
 
     @Override

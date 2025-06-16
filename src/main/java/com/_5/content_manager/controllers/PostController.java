@@ -2,6 +2,7 @@ package com._5.content_manager.controllers;
 
 import com._5.content_manager.entities.Post;
 import com._5.content_manager.entities.User;
+import com._5.content_manager.services.CommentService;
 import com._5.content_manager.services.PostService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
