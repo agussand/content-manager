@@ -153,6 +153,8 @@ public class DataGeneratorServiceImpl implements DataGeneratorService {
             postStats.setLikesCount(random.nextInt(1000));
             newPost.setStats(postStats);
 
+            userService.incrementPostCounting(usuarioRandom.getId());
+
             if(Math.random() < 0.5){
                 Media media = new Media();
                 if(Math.random() < 0.5){

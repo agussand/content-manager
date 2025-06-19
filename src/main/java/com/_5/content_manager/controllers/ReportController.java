@@ -1,6 +1,7 @@
 package com._5.content_manager.controllers;
 
 
+import com._5.content_manager.dtos.*;
 import com._5.content_manager.services.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -19,42 +20,32 @@ public class ReportController {
     private ReportService reportService;
 
     @GetMapping("/posts-by-user")
-    public ResponseEntity<List<Map>> getPostsByUserReport() {
-        List<Map> report = reportService.getPostsByUserReport();
+    public ResponseEntity<List<UserPostCountDTO>> getPostsByUserReport() {
+        List<UserPostCountDTO> report = reportService.getPostsByUserReport();
         return ResponseEntity.ok(report);
     }
 
     @GetMapping("/top-commented-posts")
-    public ResponseEntity<List<Map>> getTopCommentedPostsReport() {
-        List<Map> report = reportService.getTopCommentedPostsReport();
-        return ResponseEntity.ok(report);
-    }
-
-    @GetMapping("/posts-by-tag-and-date")
-    public ResponseEntity<List<Map>> getPostsByTagAndDateReport(
-            @RequestParam List<String> tags,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) {
-
-        List<Map> report = reportService.getPostsByTagAndDateReport(tags, startDate, endDate);
+    public ResponseEntity<List<TopCommentedPostDTO>> getTopCommentedPostsReport() {
+        List<TopCommentedPostDTO> report = reportService.getTopCommentedPostsReport();
         return ResponseEntity.ok(report);
     }
 
     @GetMapping("/monthly-average")
-    public ResponseEntity<List<Map>> getMonthlyPostsAverageReport() {
-        List<Map> report = reportService.getMonthlyPostsAverageReport();
+    public ResponseEntity<AnnualContentReportDTO> getMonthlyPostsAverageReport() {
+        AnnualContentReportDTO report = reportService.getMonthlyPostsAverageReport();
         return ResponseEntity.ok(report);
     }
 
-    @GetMapping("/comments-analysis")
-    public ResponseEntity<List<Map>> getCommentsAnalysisReport() {
-        List<Map> report = reportService.getCommentsAnalysisReport();
-        return ResponseEntity.ok(report);
+    @GetMapping("/post-engagement")
+    public ResponseEntity<List<PostEngagementDTO>> getPostEngagementReport() {
+        List<PostEngagementDTO> reportData = reportService.getPostEngagementData();
+        return ResponseEntity.ok(reportData);
     }
 
     @GetMapping("/dashboard")
-    public ResponseEntity<Map<String, Object>> getDashboardStats() {
-        Map<String, Object> stats = reportService.getDashboardStats();
+    public ResponseEntity<DashboardDTO> getDashboardStats() {
+        DashboardDTO stats = reportService.getDashboardStats();
         return ResponseEntity.ok(stats);
     }
 }

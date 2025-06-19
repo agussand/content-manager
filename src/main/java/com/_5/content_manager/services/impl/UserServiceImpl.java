@@ -86,6 +86,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void incrementPostCounting(String userId) {
+        User user = this.findById(userId);
+        user.getStats().setPostsCount(user.getStats().getPostsCount() + 1);
+        userRepository.save(user);
+    }
+
+    @Override
     public List<User> findByInterests(List<String> interests) {
         return userRepository.findByInterestsIn(interests);
     }

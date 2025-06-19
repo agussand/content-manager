@@ -1,5 +1,6 @@
 package com._5.content_manager.controllers;
 
+import com._5.content_manager.entities.Comment;
 import com._5.content_manager.entities.Post;
 import com._5.content_manager.entities.User;
 import com._5.content_manager.services.CommentService;
@@ -21,6 +22,9 @@ public class PostController {
 
     @Autowired
     private PostService postService;
+
+    @Autowired
+    private CommentService commentService;
 
     @PostMapping
     public ResponseEntity<Post> createPost(@Valid @RequestBody Post post,
@@ -68,6 +72,23 @@ public class PostController {
         Page<Post> posts = postService.getPostsByAuthor(
                 authorId, status, PageRequest.of(page, size));
         return ResponseEntity.ok(posts);
+    }
+
+    @GetMapping("/{postId}/comments")
+    public ResponseEntity<Page<Comment>> getCommentsByPost(
+            @PathVariable String postId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "publishedAt") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir) {
+
+        Sort sort = sortDir.equalsIgnoreCase("desc") ?
+                Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+        Page<Comment> comments = commentService.getCommentsByPost(
+                postId,
+                PageRequest.of(page, size, sort));
+        return ResponseEntity.ok(comments);
     }
 
     @GetMapping("/tags")

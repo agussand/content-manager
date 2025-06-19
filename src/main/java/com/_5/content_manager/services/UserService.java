@@ -15,6 +15,7 @@ public interface UserService {
     User findByEmail(String email);
     User updateUser(String id, User updatedUser);
     void updateLastLogin(String id);
+    void incrementPostCounting(String user);
     List<User> findByInterests(List<String> interests);
     List<User> getAllActiveUsers();
     void deleteUser(String id);
